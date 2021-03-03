@@ -111,7 +111,11 @@ func (s *Subscriber) OnNegotiationNeeded(f func()) {
 }
 
 func (s *Subscriber) CreateOffer() (webrtc.SessionDescription, error) {
-	offer, err := s.pc.CreateOffer(nil)
+	var ofrOpt webrtc.OfferOptions
+	if s.pc.ICEConnectionState() == webrtc.ICEConnectionStateFailed || s.pc.ICEConnectionState() == webrtc.ICEConnectionStateDisconnected {
+		ofrOpt.ICERestart = true
+	}
+	offer, err := s.pc.CreateOffer(&ofrOpt)
 	if err != nil {
 		return webrtc.SessionDescription{}, err
 	}
